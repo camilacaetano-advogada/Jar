@@ -69,7 +69,7 @@ segmentos:
     palavras: [hotel, hospedagem, estadia, pousada, resort, diaria, hostel]
     assuntos:
       - "{nome_marca}: conteúdo em Poços de Caldas em troca de diárias (4 a 7/11)"
-      - "Estarei em Poços de Caldas de 4 a 7/11, bora fazer parceria com a gente? ({nome_marca})"
+      - "Estarei em Poços de Caldas de 4 a 7/11, uma parceria com {nome_marca}?"
     corpo:
       - >-
         Sou a Camila, advogada e criadora de conteúdo de Ipatinga (MG). De 4 a 7 de novembro estarei em
