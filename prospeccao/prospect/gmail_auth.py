@@ -28,13 +28,24 @@ def autorizar() -> str:
     """Fluxo interativo (navegador). Devolve o e-mail autorizado."""
     from google_auth_oauthlib.flow import InstalledAppFlow
 
-    cliente = _arquivo_cliente()
-    if not cliente.exists():
-        raise config.ErroConfig(
-            f"Não achei {cliente}. Baixe o JSON do cliente OAuth (tipo 'App para computador') "
-            "no Google Cloud e salve com esse nome. Veja o passo a passo no README."
-        )
-    cred = InstalledAppFlow.from_client_secrets_file(str(cliente), ESCOPOS).run_local_server(port=0)
+    cid, segredo = os.environ.get("GOOGLE_CLIENT_ID", "").strip(), os.environ.get("GOOGLE_CLIENT_SECRET", "").strip()
+    if cid and segredo:
+        conf = {"installed": {
+            "client_id": cid, "client_secret": segredo,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": ["http://localhost"],
+        }}
+        fluxo = InstalledAppFlow.from_client_config(conf, ESCOPOS)
+    else:
+        cliente = _arquivo_cliente()
+        if not cliente.exists():
+            raise config.ErroConfig(
+                f"Não achei {cliente}. Baixe o JSON do cliente OAuth (tipo 'App para computador') no Google Cloud "
+                "e salve com esse nome, ou preencha GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no .env."
+            )
+        fluxo = InstalledAppFlow.from_client_secrets_file(str(cliente), ESCOPOS)
+    cred = fluxo.run_local_server(port=0)
     token = _arquivo_token()
     token.parent.mkdir(parents=True, exist_ok=True)
     token.write_text(cred.to_json(), encoding="utf-8")
