@@ -1,0 +1,90 @@
+# Textos dos e-mails. Edite à vontade. Variáveis: {nome_marca} {nome_contato} {cidade} {segmento}
+# O app alterna as variações de forma estável (o mesmo contato sempre recebe a mesma versão).
+# IMPORTANTE: não prometa resultado (financeiro, de saúde ou jurídico) e não ofereça serviços jurídicos.
+
+assuntos:
+  - "{nome_marca}, uma ideia de parceria (escrita por humana, juro)"
+  - "De Ipatinga pra {nome_marca}: bora fazer um vídeo bom?"
+  - "{nome_marca} + conteúdo com humor e edição de verdade 🎬"
+
+# Usados só quando a coluna "motivo_consumo" da planilha estiver preenchida
+assuntos_consome:
+  - "{nome_marca}, eu já uso e queria te contar isso por aqui 👀"
+  - "Fã de {nome_marca} aqui (e com ideia de parceria)"
+
+aberturas_com_contato:
+  - "Oi, {nome_contato}! Tudo bem?"
+  - "Olá, {nome_contato}, tudo certo por aí?"
+aberturas_sem_contato:
+  - "Oi, pessoal da {nome_marca}! Tudo bem?"
+  - "Olá, time da {nome_marca}, tudo certo por aí?"
+
+apresentacao: >-
+  Sou a Camila, tenho 25 anos, sou advogada e criadora de conteúdo aqui de Ipatinga, em Minas.
+  Meu universo mistura música pop, humor, fitness (odeio musculação, mas amo me arrumar pra ir 😅)
+  e uma estética que leva a edição tão a sério quanto o conteúdo. 🎬
+
+# Quando a planilha traz "motivo_consumo", o app AFIRMA que você consome a marca.
+linha_consome: >-
+  Só indico marcas que eu já consumo, e é por isso que a recomendação soa natural (e converte). {motivo_consumo}
+# Sem esse dado, o app NÃO afirma que você consome.
+linha_nova: >-
+  Sou chata com o que indico: só falo de marca que eu realmente consumiria, e a {nome_marca} entrou no meu radar.
+
+linha_cidade: "Vi que vocês estão em {cidade} e adoraria mostrar a {nome_marca} pro pessoal de lá."
+
+formatos: >-
+  Faço UGC de skincare, cabelo, lifestyle, moda, pop, viagens e festivais, em Reels, talking head
+  e vídeo estético/sensorial. Topo publi, permuta, convite e credenciamento de evento, o que fizer
+  sentido pra vocês.
+
+aviso_humano: "E sim: este e-mail foi escrito por mim, não por IA, kkk. Revisei até a vírgula. 😅"
+
+fechamentos:
+  - "Bora conversar? Me responde por aqui ou me chama no Insta."
+  - "Se fizer sentido, é só responder este e-mail. Fico feliz em mandar ideias de roteiro!"
+
+rodape: 'Se preferir não receber novos contatos, é só responder "SAIR" que eu retiro seu e-mail da lista.'
+
+# Blocos por segmento. "palavras" são buscadas (sem acento) na coluna de segmento, na ordem abaixo.
+segmentos:
+  juridico:
+    palavras: [juridic, advoc, financ, contab, banco, fintech, credito, seguro, imposto, tribut]
+    gancho: "Dinheiro, dívida e imposto assustam muita gente, e quem explica com leveza ganha a confiança do público."
+    encaixe: "Sou advogada e traduzo assunto chato em linguagem de gente. Meu foco é informar e entreter, sem promessa de resultado e sem captar clientes."
+  fitness:
+    palavras: [fitness, academia, esport, suplement, treino, wellness, nutri, atletic, ativ]
+    gancho: "Fitness que convence é o que mostra gente de verdade usando, não só corpo perfeito em pose."
+    encaixe: "Meu lance é provar que dá pra ir pra academia sem gostar de academia: o look, o cabelo e a make entram no pacote, e a {nome_marca} aparece de forma leve e natural, com humor."
+  beleza:
+    palavras: [beleza, cosmetic, skincare, cabelo, perfum, maquiagem, estetica, salao, capilar, dermo, make]
+    gancho: "Produto de beleza bom precisa de alguém que mostre a rotina real, e é isso que faz o público confiar e querer testar."
+    encaixe: "Mostro o produto em uso de verdade, no antes de sair e no depois do treino, em talking head ou em vídeo sensorial de textura, com edição caprichada."
+  eventos:
+    palavras: [evento, show, festival, musica, entretenimento, cultura, ingresso, teatro, cinema, balada, pop, midia, imprensa, assessoria]
+    gancho: "Evento e cultura pop vivem de gente contando como foi, e o público confia mais em quem estava lá."
+    encaixe: "Acompanho música pop e festival de perto e conto como foi com humor e uma edição que pega o clima do dia."
+  viagem:
+    palavras: [viagem, turismo, hotel, hospedagem, passagem, aereo, resort, pousada]
+    gancho: "Destino e hospedagem vendem quando o público consegue se imaginar lá."
+    encaixe: "Levo o público junto no rolê, com estética sensorial e storytelling, não só com cara de propaganda."
+  moda:
+    palavras: [moda, roupa, vestuario, acessorio, calcado, joia, bolsa, confeccao, lingerie, brech]
+    gancho: "Moda vende quando a peça aparece num look que a pessoa consegue imaginar na própria vida."
+    encaixe: "Monto look com personalidade e edição cuidadosa, e a peça entra na composição sem cara de anúncio."
+  lifestyle:
+    palavras: []
+    gancho: "Marca que entra na rotina do público de forma natural é a que fica na memória."
+    encaixe: "Faço conteúdo de dia a dia com roteiro e estética cuidados, então a {nome_marca} aparece de forma natural, sem cara de propaganda."
+
+followup:
+  assunto: "Re: {assunto_original}"
+  corpo:
+    - "{abertura}"
+    - >-
+      Sei que a rotina aí é pesada (e-mail, reunião, mais e-mail...), mas com uma creator profissional,
+      leve e dinâmica, o feed da {nome_marca} ganha um respiro. 😄
+    - >-
+      Passei só pra saber se você viu meu e-mail anterior sobre uma parceria. Meu portfólio continua aqui:
+      {portfolio_url}
+    - "Se não for o momento, sem problema nenhum, é só me avisar!"

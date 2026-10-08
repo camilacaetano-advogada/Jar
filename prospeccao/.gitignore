@@ -1,0 +1,7 @@
+.env
+data/
+out/
+contatos.*
+*.pdf
+__pycache__/
+.pytest_cache/
