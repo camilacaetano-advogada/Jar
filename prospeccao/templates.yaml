@@ -65,7 +65,7 @@ segmentos:
     gancho: "Evento e cultura pop vivem de gente contando como foi, e o público confia mais em quem estava lá."
     encaixe: "Acompanho música pop e festival de perto e conto como foi com humor e uma edição que pega o clima do dia."
   viagem:
-    palavras: [viagem, turismo, hotel, hospedagem, passagem, aereo, resort, pousada]
+    palavras: [viagem, turismo, hotel, hospedagem, estadia, passagem, aereo, resort, pousada]
     gancho: "Destino e hospedagem vendem quando o público consegue se imaginar lá."
     encaixe: "Levo o público junto no rolê, com estética sensorial e storytelling, não só com cara de propaganda."
   moda:
