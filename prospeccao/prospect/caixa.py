@@ -1,8 +1,7 @@
-"""Lê a caixa de entrada (IMAP do Gmail) para detectar respostas, pedidos de SAIR e bounces."""
+"""Lê a caixa de entrada (API do Gmail) para detectar respostas, pedidos de SAIR e bounces."""
 import email
-import imaplib
+import base64
 import re
-from datetime import datetime, timedelta
 from email import policy
 from email.utils import parseaddr
 
@@ -27,25 +26,24 @@ def classificar_mensagem(raw: bytes, enviados: set[str]) -> list[tuple[str, str]
     return []
 
 
-def varrer(usuario: str, senha: str, store, agora_iso: str, dias: int = 14, conexao=None) -> dict:
+def varrer(svc, store, agora_iso: str, dias: int = 14) -> dict:
     enviados = {e.lower() for e in store.todos_enviados()}
     conta = {"respondeu": 0, "sair": 0, "bounce": 0}
-    imap = conexao or imaplib.IMAP4_SSL("imap.gmail.com")
-    imap.login(usuario, senha)
-    try:
-        imap.select("INBOX", readonly=True)
-        desde = (datetime.now() - timedelta(days=dias)).strftime("%d-%b-%Y")
-        _, ids = imap.search(None, f'(SINCE "{desde}")')
-        for i in ids[0].split():
-            _, dados = imap.fetch(i, "(RFC822)")
-            for tipo, end in classificar_mensagem(dados[0][1], enviados):
-                if tipo == "sair":
-                    store.bloquear(end, "pediu SAIR por e-mail", agora_iso)
-                elif tipo == "bounce":
-                    store.definir_relacao(end, "bounce", agora_iso)
-                elif store.relacao(end) not in ("negociacao", "bounce"):
-                    store.definir_relacao(end, "respondeu", agora_iso)
-                conta[tipo] += 1
-    finally:
-        imap.logout()
+    msgs, token = [], None
+    while True:
+        r = svc.users().messages().list(userId="me", q=f"in:inbox newer_than:{dias}d", pageToken=token).execute()
+        msgs += r.get("messages", [])
+        token = r.get("nextPageToken")
+        if not token:
+            break
+    for m in msgs:
+        bruto = svc.users().messages().get(userId="me", id=m["id"], format="raw").execute()["raw"]
+        for tipo, end in classificar_mensagem(base64.urlsafe_b64decode(bruto + "=="), enviados):
+            if tipo == "sair":
+                store.bloquear(end, "pediu SAIR por e-mail", agora_iso)
+            elif tipo == "bounce":
+                store.definir_relacao(end, "bounce", agora_iso)
+            elif store.relacao(end) not in ("negociacao", "bounce"):
+                store.definir_relacao(end, "respondeu", agora_iso)
+            conta[tipo] += 1
     return conta

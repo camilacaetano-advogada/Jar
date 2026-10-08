@@ -7,10 +7,17 @@ limite diário, follow-up, registro de quem já recebeu e status na planilha.
 
 1. **Instale o Python 3.10+** (python.org) e, na pasta `prospeccao`, rode:
    `pip install -r requirements.txt`
-2. **Crie a senha de app do Gmail**: Conta Google > Segurança > ative a *Verificação em duas etapas* >
-   *Senhas de app* > crie uma. Copie as 16 letras.
-3. **Configure o acesso**: copie `.env.example` para `.env` e preencha `GMAIL_USER` e `GMAIL_APP_PASSWORD`.
-   O `.env` nunca vai para o Git e nenhuma senha fica no código.
+2. **Crie o acesso ao Gmail (OAuth, sem senha)** — o Google acabou com as senhas de app, então o login agora é assim (uma vez só):
+   1. Em [console.cloud.google.com](https://console.cloud.google.com) crie um projeto (ex.: "Prospecção").
+   2. *APIs e serviços > Biblioteca*: ative a **Gmail API**.
+   3. *APIs e serviços > Tela de permissão OAuth*: tipo **Externo**, preencha o nome do app e seu e-mail,
+      e em **Usuários de teste** adicione o seu próprio Gmail (deixe o app em modo "Teste").
+   4. *Credenciais > Criar credenciais > ID do cliente OAuth* > tipo **App para computador**. Baixe o JSON e
+      salve nesta pasta como `credentials.json`.
+3. **Autorize**: rode `python -m prospect autorizar`, escolha sua conta e aceite. (Aparece o aviso "app não
+   verificado": clique em *Avançado > Acessar*; é o seu próprio app.) Isso cria `data/token.json`.
+   Em modo "Teste" o Google expira a autorização em 7 dias; se aparecer "autorização expirou", rode `autorizar` de novo.
+   `credentials.json` e `data/token.json` nunca vão para o Git.
 4. **Coloque sua planilha** nesta pasta como `contatos.xlsx` (ou `.csv`). Colunas reconhecidas:
    `Marca`, `E-mail de Contato para Parceria`, `Ramo / Segmento`. Opcionais: `Cidade`, `Nome do contato`,
    `Motivo consumo` (veja abaixo). O app cria sozinho as colunas `Status`, `Enviado em` e `Observações`.
@@ -23,6 +30,7 @@ limite diário, follow-up, registro de quem já recebeu e status na planilha.
 
 | O que fazer | Comando |
 |---|---|
+| Autorizar o Gmail (só na 1ª vez) | `python -m prospect autorizar` |
 | Ver quantas linhas valem e quantas foram ignoradas | `python -m prospect contatos` |
 | Ver todos os e-mails no navegador | `python -m prospect previa` (abre `out/previa.html`) |
 | Simular o envio (nada sai) | `python -m prospect enviar` |

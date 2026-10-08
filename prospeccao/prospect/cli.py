@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from . import caixa, config, contacts, mailer, sender, templates
+from . import caixa, config, contacts, gmail_auth, mailer, sender, templates
 from .store import Store
 
 
@@ -29,6 +29,12 @@ def _ler_planilha(cfg, mostrar_relatorio=True):
         for n, valor in rel["invalido"][:10]:
             print(f"   linha {n}: e-mail inválido -> {valor!r}")
     return lista, rel, caminho
+
+
+def cmd_autorizar(args):
+    config.carregar_env()
+    print("Vou abrir o navegador para você autorizar o acesso ao Gmail...")
+    print(f"Pronto! Conta autorizada: {gmail_auth.autorizar()}")
 
 
 def cmd_contatos(args):
@@ -62,14 +68,15 @@ def cmd_previa(args):
 
 def cmd_teste(args):
     cfg, tpl, store = _carregar(args)
-    usuario, senha = config.credenciais()
+    svc = gmail_auth.servico()
+    usuario = gmail_auth.email_da_conta(svc)
     lista, _, _ = _ler_planilha(cfg, mostrar_relatorio=False)
     exemplos = lista[: args.quantos] or [contacts.Contato(marca="Marca Exemplo", email="x@x.com", segmento="beleza")]
     for c in exemplos:
         m = templates.montar(c, cfg, tpl)
         m.assunto = "[TESTE] " + m.assunto
         pdf = config.caminho(cfg, "pdf_portfolio") if cfg["arquivos"]["pdf_portfolio"] else None
-        mailer.enviar_smtp(mailer.montar_mime(m, usuario, usuario, cfg, pdf), usuario, senha)
+        mailer.enviar_gmail(mailer.montar_mime(m, usuario, usuario, cfg, pdf), svc)
         print(f"Teste enviado para {usuario} (exemplo: {c.marca}).")
 
 
@@ -113,9 +120,9 @@ def cmd_status(args):
 
 def cmd_caixa(args):
     cfg, tpl, store = _carregar(args)
-    usuario, senha = config.credenciais()
+    svc = gmail_auth.servico()
     agora = sender.agora_no_fuso(cfg).isoformat(timespec="seconds")
-    c = caixa.varrer(usuario, senha, store, agora, dias=args.dias)
+    c = caixa.varrer(svc, store, agora, dias=args.dias)
     print(f"Respostas: {c['respondeu']} · Pedidos de SAIR: {c['sair']} · Bounces: {c['bounce']}")
     sender.sincronizar_planilha(store, config.caminho(cfg, "planilha"))
 
@@ -144,6 +151,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="prospect", description="Prospecção de parcerias da Camila")
     ap.add_argument("--config", default=None, help="config.yaml alternativo")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("autorizar", help="liga o app ao seu Gmail (só na primeira vez)").set_defaults(f=cmd_autorizar)
     sub.add_parser("contatos", help="valida a planilha e mostra o que foi ignorado").set_defaults(f=cmd_contatos)
     sub.add_parser("previa", help="gera out/previa.html com todos os e-mails").set_defaults(f=cmd_previa)
     p = sub.add_parser("teste", help="manda e-mails de exemplo para o seu próprio Gmail")

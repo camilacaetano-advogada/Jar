@@ -5,3 +5,5 @@ contatos.*
 *.pdf
 __pycache__/
 .pytest_cache/
+credentials.json
+token.json

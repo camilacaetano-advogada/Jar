@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import config, contacts, mailer
+from . import config, contacts, gmail_auth, mailer
 from .templates import montar
 
 
@@ -77,7 +77,7 @@ def montar_fila(cfg, store, lista, seguir_followup, agora, resumo):
 
 
 def executar(cfg, tpl, store, lista, *, real, limite=None, seguir_followup=True,
-             enviar_fn=None, dormir=time.sleep, agora_fn=None, mostrar=print, rng=random, planilha=None):
+             enviar_fn=None, usuario=None, dormir=time.sleep, agora_fn=None, mostrar=print, rng=random, planilha=None):
     agora_fn = agora_fn or (lambda: agora_no_fuso(cfg))
     resumo = Resumo()
     fila = montar_fila(cfg, store, lista, seguir_followup, agora_fn(), resumo)
@@ -87,15 +87,17 @@ def executar(cfg, tpl, store, lista, *, real, limite=None, seguir_followup=True,
         mostrar("Nada para enviar agora.")
         return resumo
 
-    usuario = senha = ""
     pdf = None
     if real:
-        usuario, senha = config.credenciais()
         if cfg["arquivos"]["pdf_portfolio"]:
             pdf = config.caminho(cfg, "pdf_portfolio")
             if not pdf.exists():
                 raise config.ErroConfig(f"PDF do portfólio não encontrado: {pdf}")
-        enviar_fn = enviar_fn or (lambda mime: mailer.enviar_smtp(mime, usuario, senha))
+        if enviar_fn is None:
+            svc = gmail_auth.servico()
+            usuario = gmail_auth.email_da_conta(svc)
+            enviar_fn = lambda mime: mailer.enviar_gmail(mime, svc)  # noqa: E731
+        usuario = usuario or ""
     erros_seguidos = 0
 
     for n, (c, etapa) in enumerate(fila):

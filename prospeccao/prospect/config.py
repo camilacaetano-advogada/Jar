@@ -46,16 +46,6 @@ def carregar_templates() -> dict:
     return yaml.safe_load((RAIZ / "templates.yaml").read_text(encoding="utf-8"))
 
 
-def credenciais() -> tuple[str, str]:
-    usuario = os.environ.get("GMAIL_USER", "").strip()
-    senha = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "").strip()
-    if not usuario or not senha:
-        raise ErroConfig(
-            "Faltam GMAIL_USER e/ou GMAIL_APP_PASSWORD. Copie .env.example para .env e preencha."
-        )
-    return usuario, senha
-
-
 def caminho(cfg: dict, chave: str) -> Path:
     p = Path(cfg["arquivos"][chave])
     return p if p.is_absolute() else RAIZ / p

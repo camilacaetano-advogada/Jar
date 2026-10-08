@@ -91,13 +91,8 @@ def rodar(cfg, tpl, store, lista, enviados, **kw):
     kw.setdefault("dormir", lambda s: None)
     kw.setdefault("mostrar", lambda *a: None)
     kw.setdefault("agora_fn", lambda: datetime.now(FUSO))
-    return sender.executar(cfg, tpl, store, lista, real=True, enviar_fn=lambda mime: enviados.append(mime) or mime["Message-ID"], **kw)
-
-
-@pytest.fixture(autouse=True)
-def _env(monkeypatch):
-    monkeypatch.setenv("GMAIL_USER", "camila@gmail.com")
-    monkeypatch.setenv("GMAIL_APP_PASSWORD", "abcdabcdabcdabcd")
+    return sender.executar(cfg, tpl, store, lista, real=True, enviar_fn=lambda mime: enviados.append(mime) or mime["Message-ID"],
+                           usuario="camila@gmail.com", **kw)
 
 
 def lista3():
@@ -184,3 +179,51 @@ def test_janela_de_horario(cfg):
     sab_10h = datetime(2026, 10, 10, 10, 0, tzinfo=FUSO)
     assert sender.dentro_da_janela(cfg2, seg_10h) and not sender.dentro_da_janela(cfg2, sab_10h)
     assert sender.proxima_janela(cfg2, sab_10h).weekday() == 0
+
+
+class _Exec:
+    def __init__(self, v): self.v = v
+    def execute(self): return self.v
+
+
+class _FakeGmail:
+    """Imita só o pedaço da API do Gmail que o app usa."""
+    def __init__(self, raws=()):
+        self.raws, self.enviados = list(raws), []
+
+    def users(self): return self
+    def messages(self): return self
+
+    def send(self, userId, body):
+        self.enviados.append(body["raw"])
+        return _Exec({"id": "1"})
+
+    def list(self, userId, q, pageToken=None):
+        return _Exec({"messages": [{"id": str(i)} for i in range(len(self.raws))]})
+
+    def get(self, userId, id, format):
+        import base64
+        return _Exec({"raw": base64.urlsafe_b64encode(self.raws[int(id)]).decode().rstrip("=")})
+
+
+def test_enviar_gmail_manda_mime_em_base64(cfg, tpl):
+    import base64
+    from email import message_from_bytes, policy
+    from prospect import mailer
+
+    m = templates.montar(contacts.Contato(marca="A", email="a@a.com"), cfg, tpl)
+    mime = mailer.montar_mime(m, "a@a.com", "camila@gmail.com", cfg)
+    svc = _FakeGmail()
+    assert mailer.enviar_gmail(mime, svc) == mime["Message-ID"]
+    enviado = message_from_bytes(base64.urlsafe_b64decode(svc.enviados[0]), policy=policy.default)
+    assert enviado["To"] == "a@a.com" and enviado["Subject"] == m.assunto
+
+
+def test_varrer_caixa_via_api(tpl):
+    store = Store(":memory:")
+    store.iniciar("m2@x.com", 1, "M2", "a", "2026-10-05")
+    store.concluir("m2@x.com", 1, True, "agora")
+    resp = b"From: Ana <m2@x.com>\nTo: c@gmail.com\nSubject: Re: oi\n\nSAIR por favor"
+    c = caixa.varrer(_FakeGmail([resp]), store, "agora")
+    assert c == {"respondeu": 1, "sair": 1, "bounce": 0}
+    assert store.bloqueado("m2@x.com") and store.relacao("m2@x.com") == "respondeu"
