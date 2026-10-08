@@ -227,3 +227,12 @@ def test_varrer_caixa_via_api(tpl):
     c = caixa.varrer(_FakeGmail([resp]), store, "agora")
     assert c == {"respondeu": 1, "sair": 1, "bounce": 0}
     assert store.bloqueado("m2@x.com") and store.relacao("m2@x.com") == "respondeu"
+
+
+def test_hospedagem_usa_email_proprio(cfg, tpl):
+    c = contacts.Contato(marca="Hotel Sol", email="r@hotelsol.com", segmento="Hotel / Hospedagem", contato="Ana Souza")
+    m = templates.montar(c, cfg, tpl)
+    assert m.segmento == "hospedagem"
+    assert "Poços de Caldas" in m.texto and "Conferência Mineira da Advocacia" in m.texto and "diárias" in m.texto
+    assert "SAIR" in m.texto and "Hotel Sol" in m.texto
+    assert "já consumo" not in m.texto

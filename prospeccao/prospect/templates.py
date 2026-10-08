@@ -88,8 +88,15 @@ def montar(c: Contato, cfg: dict, tpl: dict, etapa: int = 1, assunto_original: s
         assunto = preencher(fu["assunto"], assunto_original=assunto_original, **v)
     else:
         consome = bool(c.motivo_consumo) or bool(cfg.get("consumo_geral"))
-        assuntos = tpl["assuntos_consome"] if consome else tpl["assuntos"]
+        assuntos = bloco.get("assuntos") or (tpl["assuntos_consome"] if consome else tpl["assuntos"])
         assunto = preencher(_escolher(assuntos, c.email, "assunto"), **v)
+        if "corpo" in bloco:  # segmento com e-mail próprio (ex.: hospedagem)
+            corpo = [abertura] + [preencher(b, **v) for b in bloco["corpo"]]
+            corpo.append(f"Meu portfólio: {p['portfolio_url']}\nInsta {p['instagram']} · TikTok {p['tiktok']}")
+            corpo.append(_escolher(tpl["fechamentos"], c.email, "fechamento"))
+            corpo += [assinatura, rodape]
+            texto = "\n\n".join(" ".join(b.split()) if "\n" not in b else b.strip() for b in corpo)
+            return Mensagem(assunto=assunto, texto=texto, html=_html(texto), segmento=seg)
         corpo = [abertura, preencher(bloco["gancho"], **v), preencher(tpl["apresentacao"], **v)]
         corpo.append(preencher(tpl["linha_consome" if consome else "linha_nova"], **v))
         corpo.append(preencher(bloco["encaixe"], **v))

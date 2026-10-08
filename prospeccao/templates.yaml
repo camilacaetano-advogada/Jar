@@ -64,6 +64,23 @@ segmentos:
     palavras: [evento, show, festival, musica, entretenimento, cultura, ingresso, teatro, cinema, balada, pop, midia, imprensa, assessoria]
     gancho: "Evento e cultura pop vivem de gente contando como foi, e o público confia mais em quem estava lá."
     encaixe: "Acompanho música pop e festival de perto e conto como foi com humor e uma edição que pega o clima do dia."
+  hospedagem:
+    # Hotéis/pousadas: proposta de permuta de diárias para a Conferência Mineira da Advocacia (Poços de Caldas).
+    palavras: [hotel, hospedagem, estadia, pousada, resort, diaria, hostel]
+    assuntos:
+      - "{nome_marca}: conteúdo em Poços de Caldas em troca de diárias (4 a 7/11)"
+      - "Estarei em Poços de Caldas de 4 a 7/11, bora fazer parceria com a gente? ({nome_marca})"
+    corpo:
+      - >-
+        Sou a Camila, advogada e criadora de conteúdo de Ipatinga (MG). De 4 a 7 de novembro estarei em
+        Poços de Caldas para a Conferência Mineira da Advocacia e queria propor uma parceria de permuta com vocês ({nome_marca}).
+      - >-
+        A ideia: eu me hospedo com vocês e, em troca das diárias, mostro minha rotina durante a conferência
+        (arrumar pra evento, trabalhar, descansar) e como a hospedagem de vocês se encaixa nisso: o quarto, o café, a estrutura,
+        a localização. Em Reels e stories com roteiro, edição cuidada e estética sensorial, sem cara de propaganda.
+      - >-
+        Posso adaptar o roteiro ao que vocês quiserem destacar. Se topar, me conta quais datas e acomodações
+        vocês teriam disponíveis e eu envio uma proposta com os formatos e entregas combinados.
   viagem:
     palavras: [viagem, turismo, hotel, hospedagem, estadia, passagem, aereo, resort, pousada]
     gancho: "Destino e hospedagem vendem quando o público consegue se imaginar lá."
