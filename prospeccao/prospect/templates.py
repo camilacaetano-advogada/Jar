@@ -87,7 +87,7 @@ def montar(c: Contato, cfg: dict, tpl: dict, etapa: int = 1, assunto_original: s
         corpo += [assinatura, rodape]
         assunto = preencher(fu["assunto"], assunto_original=assunto_original, **v)
     else:
-        consome = bool(c.motivo_consumo)
+        consome = bool(c.motivo_consumo) or bool(cfg.get("consumo_geral"))
         assuntos = tpl["assuntos_consome"] if consome else tpl["assuntos"]
         assunto = preencher(_escolher(assuntos, c.email, "assunto"), **v)
         corpo = [abertura, preencher(bloco["gancho"], **v), preencher(tpl["apresentacao"], **v)]

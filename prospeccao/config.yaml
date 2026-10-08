@@ -20,7 +20,7 @@ arquivos:
 envio:
   intervalo_min: 60           # segundos entre e-mails
   intervalo_max: 90           # variação aleatória entre min e max
-  limite_diario: 20           # comece baixo; Gmail pessoal aguenta ~500/dia, mas spam não perdoa
+  limite_diario: 30           # Camila escolheu 30/dia
   horario:
     dias: [0, 1, 2, 3, 4]     # 0 = segunda ... 6 = domingo
     inicio: "09:00"
@@ -39,6 +39,10 @@ audiencia:
 prova_social:
   ativo: false
   texto: ""                   # ex.: "Já fiz conteúdo para A, B e C."
+
+# true = a Camila confirmou que consome/já consumiu TODAS as marcas da lista atual.
+# Com isso o e-mail afirma o consumo mesmo sem a coluna 'Motivo consumo'.
+consumo_geral: true
 
 aviso_humano:
   ativo: true                 # a piada "não foi escrito por IA, kkk" (só deixe se você revisar os textos!)

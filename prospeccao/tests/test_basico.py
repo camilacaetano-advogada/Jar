@@ -66,6 +66,7 @@ def test_segmentos(tpl):
 
 
 def test_email_sem_contato_nem_promessa_falsa(cfg, tpl):
+    cfg["consumo_geral"] = False
     c = contacts.Contato(marca="Glow", email="oi@glow.com.br", segmento="Beleza")
     m = templates.montar(c, cfg, tpl)
     assert "Oi, pessoal da Glow" in m.texto or "time da Glow" in m.texto
@@ -73,6 +74,9 @@ def test_email_sem_contato_nem_promessa_falsa(cfg, tpl):
     assert "já consumo" not in m.texto  # sem motivo_consumo, não afirma que consome
     assert "@camilaarcanjo.c" in m.texto and "@advocunty" in m.texto
     assert "SAIR" in m.texto and "portfolio-ugc" in m.texto
+    cfg["consumo_geral"] = True
+    assert "já consumo" in templates.montar(c, cfg, tpl).texto
+    cfg["consumo_geral"] = False
     c.motivo_consumo = "Uso o sérum de vocês há 1 ano."
     assert "já consumo" in templates.montar(c, cfg, tpl).texto
 
