@@ -236,3 +236,15 @@ def test_hospedagem_usa_email_proprio(cfg, tpl):
     assert "Poços de Caldas" in m.texto and "Conferência Mineira da Advocacia" in m.texto and "diárias" in m.texto
     assert "SAIR" in m.texto and "Hotel Sol" in m.texto
     assert "já consumo" not in m.texto
+
+
+def test_hospedagem_sai_primeiro_na_fila(cfg, tpl):
+    lista = [
+        contacts.Contato(marca="Glow", email="g@glow.com", segmento="Beleza"),
+        contacts.Contato(marca="Moda1", email="m@moda.com", segmento="Moda"),
+        contacts.Contato(marca="Hotel A", email="a@hotel.com", segmento="Permuta p/ Estadia"),
+        contacts.Contato(marca="Hotel B", email="b@hotel.com", segmento="Hotel"),
+    ]
+    enviados = []
+    rodar(cfg, tpl, Store(":memory:"), lista, enviados)
+    assert [m["To"] for m in enviados] == ["a@hotel.com", "b@hotel.com", "g@glow.com", "m@moda.com"]

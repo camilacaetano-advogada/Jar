@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from . import config, contacts, gmail_auth, mailer
-from .templates import montar
+from .templates import classificar, montar
 
 
 class Resumo:
@@ -45,8 +45,10 @@ def proxima_janela(cfg, agora):
     return agora + timedelta(hours=1)
 
 
-def montar_fila(cfg, store, lista, seguir_followup, agora, resumo):
-    """Lista de (contato, etapa). Follow-ups primeiro (são mais antigos), depois novos."""
+def montar_fila(cfg, store, lista, seguir_followup, agora, resumo, tpl=None):
+    """Lista de (contato, etapa). Follow-ups primeiro (são mais antigos), depois novos.
+
+    Entre os novos, os segmentos de `prioridade_segmentos` (padrão: hospedagem) saem antes; a ordem da planilha se mantém."""
     followups, novos = [], []
     limite_fu = agora - timedelta(days=cfg["followup"]["dias"])
     for c in lista:
@@ -73,14 +75,20 @@ def montar_fila(cfg, store, lista, seguir_followup, agora, resumo):
             followups.append((c, 2))
         else:
             resumo.pular("já recebeu; follow-up ainda não venceu")
-    return followups + novos
+    prioridade = cfg.get("prioridade_segmentos", ["hospedagem"]) if tpl else []
+
+    def rank(item):
+        seg = classificar(item[0].segmento, tpl)
+        return prioridade.index(seg) if seg in prioridade else len(prioridade)
+
+    return followups + sorted(novos, key=rank)  # sorted é estável
 
 
 def executar(cfg, tpl, store, lista, *, real, limite=None, seguir_followup=True,
              enviar_fn=None, usuario=None, dormir=time.sleep, agora_fn=None, mostrar=print, rng=random, planilha=None):
     agora_fn = agora_fn or (lambda: agora_no_fuso(cfg))
     resumo = Resumo()
-    fila = montar_fila(cfg, store, lista, seguir_followup, agora_fn(), resumo)
+    fila = montar_fila(cfg, store, lista, seguir_followup, agora_fn(), resumo, tpl)
     if limite is not None:
         fila = fila[:limite]
     if not fila:

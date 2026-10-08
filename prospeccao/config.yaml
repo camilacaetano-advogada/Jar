@@ -27,6 +27,9 @@ envio:
     fim: "18:00"
     fuso: "America/Sao_Paulo"
 
+# Segmentos que saem primeiro na fila (os demais seguem a ordem da planilha).
+prioridade_segmentos: ["hospedagem"]
+
 followup:
   ativo: true
   dias: 6                     # só para quem não respondeu; no máximo 1 follow-up
